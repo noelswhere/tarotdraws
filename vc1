@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>自动抽塔罗牌</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --panel:#121a2a;
+      --card:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#a78bfa;
+      --accent2:#22c55e;
+      --danger:#ef4444;
+      --border:rgba(255,255,255,.10);
+      --shadow: 0 18px 40px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC","Microsoft YaHei", Arial;
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(167,139,250,.18), transparent 60%),
+                  radial-gradient(1000px 600px at 80% 20%, rgba(34,197,94,.12), transparent 55%),
+                  linear-gradient(180deg, #070a12, var(--bg));
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      padding:28px 18px 10px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    h1{
+      margin:0 0 6px;
+      font-size:22px;
+      letter-spacing:.5px;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+    main{
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 18px 34px;
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:16px;
+    }
+    @media (max-width: 980px){
+      main{grid-template-columns:1fr}
+    }
+
+    .panel{
+      background: rgba(18,26,42,.9);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panel .hd strong{
+      font-size:14px;
+      letter-spacing:.4px;
+    }
+    .panel .bd{ padding:14px; }
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:10px 0 6px;
+    }
+    select, textarea, input[type="text"]{
+      width:100%;
+      background:#0b1220;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--text);
+      outline:none;
+    }
+    textarea{min-height:90px; resize:vertical; line-height:1.6}
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(167,139,250,.35), rgba(167,139,250,.15));
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      letter-spacing:.3px;
+      transition:.15s transform, .15s filter;
+      flex:1;
+      min-width:120px;
+    }
+    .btn:hover{ filter:brightness(1.08) }
+    .btn:active{ transform:translateY(1px) }
+    .btn.secondary{
+      background: rgba(255,255,255,.06);
+    }
+    .btn.danger{
+      background: linear-gradient(180deg, rgba(239,68,68,.35), rgba(239,68,68,.12));
+    }
+    .check{
+      display:flex; align-items:center; gap:10px; margin-top:10px;
+      padding:10px 12px; border:1px solid var(--border); border-radius:12px;
+      background: rgba(255,255,255,.04);
+    }
+    .check input{ transform:scale(1.1) }
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .results{
+      padding:14px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:12px;
+    }
+    @media (max-width: 980px){
+      .results{grid-template-columns: repeat(2, minmax(0, 1fr));}
+    }
+    @media (max-width: 560px){
+      .results{grid-template-columns:1fr;}
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: rgba(15,23,42,.85);
+      box-shadow: 0 10px 28px rgba(0,0,0,.30);
+      overflow:hidden;
+      position:relative;
+    }
+    .card .top{
+      padding:12px 12px 10px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .badge{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      background: rgba(255,255,255,.04);
+      white-space:nowrap;
+    }
+    .badge.up{ color:#c7d2fe; border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.08);}
+    .badge.rev{ color:#fecaca; border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08);}
+    .title{
+      font-weight:800;
+      margin:0;
+      font-size:14px;
+      line-height:1.3;
+    }
+    .subtitle{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .art{
+      height:110px;
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      background:
+        radial-gradient(220px 100px at 25% 35%, rgba(167,139,250,.28), transparent 62%),
+        radial-gradient(200px 100px at 70% 30%, rgba(34,197,94,.20), transparent 58%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(229,231,235,.82);
+      letter-spacing:1px;
+      font-weight:800;
+      text-transform:uppercase;
+      user-select:none;
+    }
+    .body{
+      padding:12px;
+    }
+    .body p{
+      margin:0;
+      font-size:12px;
+      color:#d1d5db;
+      line-height:1.7;
+      white-space:pre-wrap;
+    }
+    .slot{
+      font-size:11px;
+      color: var(--muted);
+      margin-bottom:6px;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:16px;
+      transform:translateX(-50%);
+      background: rgba(17,24,39,.92);
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      box-shadow: var(--shadow);
+      font-size:12px;
+      opacity:0;
+      pointer-events:none;
+      transition:.18s opacity;
+    }
+    .toast.show{ opacity:1; }
+    footer{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 18px 26px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
+    a{ color:#c7d2fe; text-decoration:none }
+    a:hover{ text-decoration:underline }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>自动抽塔罗牌</h1>
+    <p class="sub">本页面离线可用；随机洗牌抽取，不重复；支持正/逆位与常见牌阵。</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="hd">
+        <strong>设置</strong>
+        <span class="badge">78 张</span>
+      </div>
+      <div class="bd">
+        <label for="question">问题（可选）</label>
+        <textarea id="question" placeholder="例如：我接下来三个月的工作走向？"></textarea>
+
+        <label for="spread">牌阵</label>
+        <select id="spread">
+          <option value="one">单张（1）</option>
+          <option value="three">三张（过去 / 现在 / 未来）</option>
+          <option value="celtic10">凯尔特十字（10）</option>
+        </select>
+
+        <div class="check">
+          <input id="allowReversed" type="checkbox" checked />
+          <label for="allowReversed" style="margin:0; color:var(--text); font-size:13px;">允许逆位（随机出现）</label>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn" id="drawBtn">抽牌</button>
+          <button class="btn secondary" id="reshuffleBtn">重新洗牌</button>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <button class="btn secondary" id="copyBtn">复制结果</button>
+          <button class="btn danger" id="clearBtn">清空</button>
+        </div>
+
+        <div class="hint">
+          说明：此版本的“含义”是简要关键词，适合做自动抽牌演示；你可以在代码里把每张牌的解释扩写成你自己的体系。
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="hd">
+        <strong>抽牌结果</strong>
+        <span class="badge" id="stateBadge">未抽牌</span>
+      </div>
+      <div class="results" id="results"></div>
+    </section>
+  </main>
+
+  <footer>
+    本页面为纯前端示例：将 <span class="mono">index.html</span> 部署到静态托管即可上线。
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/**
+ * 自动抽塔罗牌（单文件版）
+ * - 78 张：大阿尔卡那 22 + 小阿尔卡那 56
+ * - 不重复抽取
+ * - 可选逆位
+ */
+
+const SPREADS = {
+  one: {
+    name: "单张",
+    slots: ["指引"]
+  },
+  three: {
+    name: "三张",
+    slots: ["过去", "现在", "未来"]
+  },
+  celtic10: {
+    name: "凯尔特十字",
+    slots: [
+      "现状", "阻碍/助力", "潜意识/根源", "近期过去",
+      "可能结果", "近期未来", "你的位置", "外界影响",
+      "希望与恐惧", "最终结果"
+    ]
+  }
+};
+
+// ---- 牌库（简要关键词，可自行扩写） ----
+const MAJOR = [
+  { name: "愚者", up: "开始、自由、冒险", rev: "鲁莽、逃避、缺乏计划" },
+  { name: "魔术师", up: "行动、资源、创造", rev: "操控、分散、技巧不足" },
+  { name: "女祭司", up: "直觉、内在、秘密", rev: "迟钝、隐瞒、忽视直觉" },
+  { name: "女皇", up: "滋养、丰盛、成长", rev: "停滞、过度、依赖" },
+  { name: "皇帝", up: "秩序、权威、结构", rev: "专断、失控、僵化" },
+  { name: "教皇", up: "传统、学习、指引", rev: "教条、反叛、误导" },
+  { name: "恋人", up: "选择、关系、契合", rev: "分歧、诱惑、失衡" },
+  { name: "战车", up: "推进、胜利、意志", rev: "失控、冲突、停滞" },
+  { name: "力量", up: "勇气、耐心、柔韧", rev: "怯懦、冲动、内耗" },
+  { name: "隐者", up: "独处、洞见、寻找", rev: "孤立、逃避、迷茫" },
+  { name: "命运之轮", up: "转机、循环、机会", rev: "阻滞、反复、时机未到" },
+  { name: "正义", up: "公平、因果、决断", rev: "偏颇、逃避责任、误判" },
+  { name: "倒吊人", up: "暂停、换角度、牺牲", rev: "拖延、僵局、无谓牺牲" },
+  { name: "死神", up: "结束、更新、蜕变", rev: "抗拒改变、停滞、旧事难放" },
+  { name: "节制", up: "平衡、调和、疗愈", rev: "极端、失衡、消耗" },
+  { name: "恶魔", up: "束缚、欲望、执念", rev: "解脱、觉醒、戒断" },
+  { name: "高塔", up: "震荡、真相、崩塌重建", rev: "延迟爆发、顽固、侥幸" },
+  { name: "星星", up: "希望、恢复、指引", rev: "失望、怀疑、信心不足" },
+  { name: "月亮", up: "潜意识、迷雾、想象", rev: "揭露、清醒、焦虑缓解" },
+  { name: "太阳", up: "成功、喜悦、清晰", rev: "延迟、阴影、过度自信" },
+  { name: "审判", up: "觉醒、召唤、复盘", rev: "犹豫、后悔、拒绝面对" },
+  { name: "世界", up: "完成、整合、圆满", rev: "未竟、分散、循环未完" }
+];
+
+const SUITS = [
+  { suit: "权杖", upTheme: "行动/热情", revTheme: "拖延/冲突" },
+  { suit: "圣杯", upTheme: "情感/关系", revTheme: "情绪化/失衡" },
+  { suit: "宝剑", upTheme: "思维/沟通", revTheme: "焦虑/对立" },
+  { suit: "星币", upTheme: "现实/金钱", revTheme: "不稳/贪恋" }
+];
+
+const RANKS = [
+  { r:"A", name:"Ace", up:"新机会、种子、开启", rev:"机会受阻、延迟" },
+  { r:"2", name:"Two", up:"选择、平衡、合作", rev:"摇摆、对立" },
+  { r:"3", name:"Three", up:"扩展、协作、成果", rev:"分歧、延误" },
+  { r:"4", name:"Four", up:"稳定、休整、边界", rev:"僵化、不安" },
+  { r:"5", name:"Five", up:"冲突、变化、挑战", rev:"缓和、回避" },
+  { r:"6", name:"Six", up:"进展、支持、回报", rev:"拖欠、失衡" },
+  { r:"7", name:"Seven", up:"考验、坚持、策略", rev:"泄气、走捷径" },
+  { r:"8", name:"Eight", up:"推进、熟练、加速", rev:"停滞、分心" },
+  { r:"9", name:"Nine", up:"积累、临门一脚、韧性", rev:"疲惫、疑虑" },
+  { r:"10", name:"Ten", up:"完成、高潮、结果", rev:"过载、尾声拖延" },
+  { r:"P", name:"Page", up:"消息、学习、好奇", rev:"幼稚、误讯" },
+  { r:"N", name:"Knight", up:"行动、推进、追求", rev:"鲁莽、失序" },
+  { r:"Q", name:"Queen", up:"内化、掌控、成熟", rev:"情绪/控制失衡" },
+  { r:"K", name:"King", up:"领导、稳定、负责", rev:"专横、固执" }
+];
+
+function buildDeck(){
+  const deck = [];
+  // Major 22
+  for (const c of MAJOR){
+    deck.push({
+      id: "M-" + c.name,
+      name: c.name,
+      arcana: "大阿尔卡那",
+      up: c.up,
+      rev: c.rev
+    });
+  }
+  // Minor 56
+  for (const s of SUITS){
+    for (const rk of RANKS){
+      const display = `${s.suit}${rk.r}`;
+      deck.push({
+        id: `m-${s.suit}-${rk.r}`,
+        name: `${display}（${s.suit}）`,
+        arcana: "小阿尔卡那",
+        up: `${s.upTheme}：${rk.up}`,
+        rev: `${s.revTheme}：${rk.rev}`
+      });
+    }
+  }
+  return deck;
+}
+
+let deck = buildDeck();
+let rngSeed = null; // 可扩展成可复现随机；此处保留接口
+let lastDraw = [];
+
+const els = {
+  spread: document.getElementById("spread"),
+  allowReversed: document.getElementById("allowReversed"),
+  drawBtn: document.getElementById("drawBtn"),
+  reshuffleBtn: document.getElementById("reshuffleBtn"),
+  copyBtn: document.getElementById("copyBtn"),
+  clearBtn: document.getElementById("clearBtn"),
+  results: document.getElementById("results"),
+  badge: document.getElementById("stateBadge"),
+  question: document.getElementById("question"),
+  toast: document.getElementById("toast")
+};
+
+function toast(msg){
+  els.toast.textContent = msg;
+  els.toast.classList.add("show");
+  setTimeout(() => els.toast.classList.remove("show"), 1400);
+}
+
+// Fisher-Yates shuffle
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let shuffled = shuffle(deck);
+let cursor = 0;
+
+function reshuffle(){
+  shuffled = shuffle(deck);
+  cursor = 0;
+  toast("已重新洗牌");
+}
+
+function draw(n){
+  if (cursor + n > shuffled.length){
+    // 抽完自动重洗
+    reshuffle();
+  }
+  const picked = shuffled.slice(cursor, cursor + n);
+  cursor += n;
+  return picked;
+}
+
+function render(draws, spreadKey){
+  els.results.innerHTML = "";
+  const spread = SPREADS[spreadKey];
+  const allowRev = els.allowReversed.checked;
+
+  draws.forEach((card, idx) => {
+    const reversed = allowRev ? (Math.random() < 0.35) : false; // 逆位概率可调
+    const meaning = reversed ? card.rev : card.up;
+
+    const el = document.createElement("div");
+    el.className = "card";
+    el.innerHTML = `
+      <div class="top">
+        <div>
+          <p class="title">${card.name}</p>
+          <p class="subtitle">${card.arcana}</p>
+        </div>
+        <span class="badge ${reversed ? "rev":"up"}">${reversed ? "逆位" : "正位"}</span>
+      </div>
+      <div class="art">${card.arcana === "大阿尔卡那" ? "MAJOR" : "MINOR"}</div>
+      <div class="body">
+        <div class="slot">位置：${spread.slots[idx] ?? ("第" + (idx+1) + "张")}</div>
+        <p>${meaning}</p>
+      </div>
+    `;
+    els.results.appendChild(el);
+
+    card.__reversed = reversed;
+    card.__meaning = meaning;
+    card.__slot = spread.slots[idx] ?? ("第" + (idx+1) + "张");
+  });
+
+  const q = els.question.value.trim();
+  const ts = new Date().toLocaleString("zh-CN");
+  els.badge.textContent = `已抽：${SPREADS[spreadKey].name} · ${draws.length} 张`;
+
+  lastDraw = {
+    time: ts,
+    question: q,
+    spread: SPREADS[spreadKey].name,
+    cards: draws.map(c => ({
+      slot: c.__slot,
+      name: c.name,
+      orientation: c.__reversed ? "逆位" : "正位",
+      meaning: c.__meaning
+    }))
+  };
+}
+
+function onDraw(){
+  const spreadKey = els.spread.value;
+  const spread = SPREADS[spreadKey];
+  const picked = draw(spread.slots.length);
+  render(picked, spreadKey);
+}
+
+function onCopy(){
+  if (!lastDraw || !lastDraw.cards){
+    toast("暂无可复制内容");
+    return;
+  }
+  const lines = [];
+  lines.push(`时间：${lastDraw.time}`);
+  if (lastDraw.question) lines.push(`问题：${lastDraw.question}`);
+  lines.push(`牌阵：${lastDraw.spread}`);
+  lines.push("");
+  for (const c of lastDraw.cards){
+    lines.push(`${c.slot}：${c.name}（${c.orientation}）`);
+    lines.push(`- 含义：${c.meaning}`);
+  }
+  const text = lines.join("\n");
+  navigator.clipboard.writeText(text)
+    .then(() => toast("已复制到剪贴板"))
+    .catch(() => toast("复制失败：浏览器不允许"));
+}
+
+function onClear(){
+  els.results.innerHTML = "";
+  els.badge.textContent = "未抽牌";
+  lastDraw = [];
+  toast("已清空");
+}
+
+els.drawBtn.addEventListener("click", onDraw);
+els.reshuffleBtn.addEventListener("click", reshuffle);
+els.copyBtn.addEventListener("click", onCopy);
+els.clearBtn.addEventListener("click", onClear);
+
+// 初始提示
+els.results.innerHTML = `
+  <div class="card" style="grid-column:1/-1;">
+    <div class="top">
+      <div>
+        <p class="title">准备就绪</p>
+        <p class="subtitle">选择牌阵后点击“抽牌”</p>
+      </div>
+      <span class="badge">提示</span>
+    </div>
+    <div class="art">TAROT</div>
+    <div class="body">
+      <p>你可以先写问题，再抽牌。若想做“更像真正塔罗”的效果：为每张牌补充更长解释、加入图片素材、增加牌阵自定义即可。</p>
+    </div>
+  </div>
+`;
+</script>
+</body>
+</html>

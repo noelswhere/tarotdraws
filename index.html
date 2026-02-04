@@ -4,77 +4,111 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>自动抽塔罗牌</title>
+
+  <!-- 圆润字体：优先用系统字体；若可联网会自动用 Google 的 Noto Sans Rounded -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Rounded:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg:#0b0f19;
-      --panel:#121a2a;
-      --card:#0f172a;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --accent:#a78bfa;
-      --accent2:#22c55e;
-      --danger:#ef4444;
-      --border:rgba(255,255,255,.10);
-      --shadow: 0 18px 40px rgba(0,0,0,.45);
+      --bg:#ffffff;
+      --fg:#111111;
+      --muted:#666666;
+      --line:#e9e9e9;
+      --soft:#f7f7f7;
+      --radius:16px;
+      --radius2:22px;
+      --shadow: 0 10px 22px rgba(0,0,0,.06);
     }
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC","Microsoft YaHei", Arial;
-      background: radial-gradient(1200px 700px at 20% 10%, rgba(167,139,250,.18), transparent 60%),
-                  radial-gradient(1000px 600px at 80% 20%, rgba(34,197,94,.12), transparent 55%),
-                  linear-gradient(180deg, #070a12, var(--bg));
-      color:var(--text);
-      min-height:100vh;
+      background:var(--bg);
+      color:var(--fg);
+      font-family: "Noto Sans Rounded", ui-rounded, system-ui, -apple-system, "SF Pro Rounded",
+                   "PingFang SC", "Hiragino Sans", "Microsoft YaHei", Arial, sans-serif;
+      line-height:1.5;
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:28px 18px 50px;
     }
     header{
-      padding:28px 18px 10px;
-      max-width:1100px;
-      margin:0 auto;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
     }
     h1{
-      margin:0 0 6px;
+      margin:0;
       font-size:22px;
-      letter-spacing:.5px;
+      letter-spacing:.2px;
+      font-weight:800;
     }
     .sub{
-      margin:0;
+      margin:8px 0 0;
       color:var(--muted);
       font-size:13px;
-      line-height:1.6;
+      max-width:62ch;
     }
+
+    .topRight{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid var(--line);
+      background:var(--soft);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      user-select:none;
+      white-space:nowrap;
+    }
+
     main{
-      max-width:1100px;
-      margin:0 auto;
-      padding:14px 18px 34px;
       display:grid;
       grid-template-columns: 360px 1fr;
       gap:16px;
+      align-items:start;
     }
     @media (max-width: 980px){
-      main{grid-template-columns:1fr}
+      main{ grid-template-columns:1fr; }
     }
 
     .panel{
-      background: rgba(18,26,42,.9);
-      border:1px solid var(--border);
-      border-radius:16px;
+      border:1px solid var(--line);
+      border-radius:var(--radius2);
+      background:#fff;
       box-shadow: var(--shadow);
       overflow:hidden;
     }
     .panel .hd{
       padding:14px 14px 10px;
-      border-bottom:1px solid var(--border);
+      border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
     }
     .panel .hd strong{
-      font-size:14px;
-      letter-spacing:.4px;
+      font-size:13px;
+      letter-spacing:.2px;
+      font-weight:800;
     }
     .panel .bd{ padding:14px; }
+
     label{
       display:block;
       font-size:12px;
@@ -83,48 +117,57 @@
     }
     select, textarea, input[type="text"]{
       width:100%;
-      background:#0b1220;
-      border:1px solid var(--border);
-      border-radius:12px;
+      border:1px solid var(--line);
+      border-radius:14px;
       padding:10px 12px;
-      color:var(--text);
+      background:#fff;
+      color:var(--fg);
       outline:none;
+      font-size:14px;
+      font-family: inherit;
     }
-    textarea{min-height:90px; resize:vertical; line-height:1.6}
-    .row{
+    textarea{ min-height:86px; resize:vertical; }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .btn{
+      flex:1;
+      min-width:130px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      background:#fff;
+      color:var(--fg);
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.2px;
+      transition: .12s transform, .12s background;
+    }
+    .btn:hover{ background:var(--soft); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: #111;
+      color:#fff;
+      border-color:#111;
+    }
+    .btn.primary:hover{ background:#222; }
+    .btn.danger{
+      border-color:#ddd;
+      color:#b00020;
+    }
+
+    .check{
       display:flex;
       gap:10px;
       align-items:center;
-      flex-wrap:wrap;
-    }
-    .btn{
-      appearance:none;
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(167,139,250,.35), rgba(167,139,250,.15));
-      color:var(--text);
+      border:1px solid var(--line);
+      background:var(--soft);
       padding:10px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:600;
-      letter-spacing:.3px;
-      transition:.15s transform, .15s filter;
-      flex:1;
-      min-width:120px;
+      border-radius:14px;
+      margin-top:10px;
     }
-    .btn:hover{ filter:brightness(1.08) }
-    .btn:active{ transform:translateY(1px) }
-    .btn.secondary{
-      background: rgba(255,255,255,.06);
-    }
-    .btn.danger{
-      background: linear-gradient(180deg, rgba(239,68,68,.35), rgba(239,68,68,.12));
-    }
-    .check{
-      display:flex; align-items:center; gap:10px; margin-top:10px;
-      padding:10px 12px; border:1px solid var(--border); border-radius:12px;
-      background: rgba(255,255,255,.04);
-    }
-    .check input{ transform:scale(1.1) }
+    .check input{ transform: scale(1.05); }
+    .check span{ font-size:13px; }
+
     .hint{
       margin-top:10px;
       font-size:12px;
@@ -139,292 +182,457 @@
       gap:12px;
     }
     @media (max-width: 980px){
-      .results{grid-template-columns: repeat(2, minmax(0, 1fr));}
+      .results{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 560px){
-      .results{grid-template-columns:1fr;}
+      .results{ grid-template-columns: 1fr; }
     }
 
     .card{
-      border:1px solid var(--border);
-      border-radius:16px;
-      background: rgba(15,23,42,.85);
-      box-shadow: 0 10px 28px rgba(0,0,0,.30);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
       overflow:hidden;
-      position:relative;
+      background:#fff;
+      box-shadow: var(--shadow);
     }
     .card .top{
-      padding:12px 12px 10px;
+      padding:12px;
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:10px;
     }
-    .badge{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      color:var(--muted);
-      background: rgba(255,255,255,.04);
-      white-space:nowrap;
-    }
-    .badge.up{ color:#c7d2fe; border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.08);}
-    .badge.rev{ color:#fecaca; border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08);}
     .title{
-      font-weight:800;
       margin:0;
       font-size:14px;
-      line-height:1.3;
+      font-weight:900;
+      line-height:1.2;
+      letter-spacing:.1px;
     }
     .subtitle{
       margin:6px 0 0;
-      color:var(--muted);
       font-size:12px;
-      line-height:1.5;
+      color:var(--muted);
     }
+
+    .badge{
+      font-size:11px;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:var(--soft);
+      color:var(--muted);
+      white-space:nowrap;
+      font-weight:700;
+    }
+    .badge.upright{ color:#111; }
+    .badge.reversed{ color:#b00020; }
+
+    /* 维特牌：默认使用本地图片（可选），找不到图片就显示简洁占位牌背 */
     .art{
-      height:110px;
-      border-top:1px solid var(--border);
-      border-bottom:1px solid var(--border);
-      background:
-        radial-gradient(220px 100px at 25% 35%, rgba(167,139,250,.28), transparent 62%),
-        radial-gradient(200px 100px at 70% 30%, rgba(34,197,94,.20), transparent 58%),
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      height:200px;
+      border-top:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, #fafafa, #f3f3f3);
       display:flex;
       align-items:center;
       justify-content:center;
-      color: rgba(229,231,235,.82);
-      letter-spacing:1px;
+      position:relative;
+    }
+    .art img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .placeholder{
+      width:82%;
+      height:82%;
+      border:1px dashed #d6d6d6;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#888;
       font-weight:800;
+      letter-spacing:1px;
       text-transform:uppercase;
       user-select:none;
     }
+
     .body{
       padding:12px;
     }
-    .body p{
+    .slot{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-weight:700;
+    }
+    .meaning{
       margin:0;
       font-size:12px;
-      color:#d1d5db;
+      color:#222;
       line-height:1.7;
       white-space:pre-wrap;
     }
-    .slot{
-      font-size:11px;
-      color: var(--muted);
-      margin-bottom:6px;
-    }
+
     .toast{
       position:fixed;
       left:50%;
       bottom:16px;
       transform:translateX(-50%);
-      background: rgba(17,24,39,.92);
-      border:1px solid var(--border);
-      color:var(--text);
+      background:#111;
+      color:#fff;
       padding:10px 12px;
-      border-radius:12px;
-      box-shadow: var(--shadow);
+      border-radius:999px;
       font-size:12px;
       opacity:0;
       pointer-events:none;
       transition:.18s opacity;
+      box-shadow: 0 10px 22px rgba(0,0,0,.14);
     }
     .toast.show{ opacity:1; }
+
     footer{
-      max-width:1100px;
-      margin:0 auto;
-      padding:0 18px 26px;
-      color:var(--muted);
+      margin-top:16px;
       font-size:12px;
-      line-height:1.6;
+      color:var(--muted);
+      line-height:1.7;
     }
-    a{ color:#c7d2fe; text-decoration:none }
-    a:hover{ text-decoration:underline }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background: var(--soft);
+      border:1px solid var(--line);
+      padding:2px 6px;
+      border-radius:999px;
+    }
+    a{ color:#111; }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>自动抽塔罗牌</h1>
-    <p class="sub">本页面离线可用；随机洗牌抽取，不重复；支持正/逆位与常见牌阵。</p>
-  </header>
-
-  <main>
-    <section class="panel">
-      <div class="hd">
-        <strong>设置</strong>
-        <span class="badge">78 张</span>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1 id="pageTitle">自动抽塔罗牌</h1>
+        <p class="sub" id="pageSub">本页面离线可用；白底黑字、简约优雅；支持中/英/日与维特（RWS）牌名/关键词。</p>
       </div>
-      <div class="bd">
-        <label for="question">问题（可选）</label>
-        <textarea id="question" placeholder="例如：我接下来三个月的工作走向？"></textarea>
 
-        <label for="spread">牌阵</label>
-        <select id="spread">
-          <option value="one">单张（1）</option>
-          <option value="three">三张（过去 / 现在 / 未来）</option>
-          <option value="celtic10">凯尔特十字（10）</option>
-        </select>
-
-        <div class="check">
-          <input id="allowReversed" type="checkbox" checked />
-          <label for="allowReversed" style="margin:0; color:var(--text); font-size:13px;">允许逆位（随机出现）</label>
-        </div>
-
-        <div class="row" style="margin-top:12px;">
-          <button class="btn" id="drawBtn">抽牌</button>
-          <button class="btn secondary" id="reshuffleBtn">重新洗牌</button>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <button class="btn secondary" id="copyBtn">复制结果</button>
-          <button class="btn danger" id="clearBtn">清空</button>
-        </div>
-
-        <div class="hint">
-          说明：此版本的“含义”是简要关键词，适合做自动抽牌演示；你可以在代码里把每张牌的解释扩写成你自己的体系。
+      <div class="topRight">
+        <div class="pill" id="cardsPill">78 张</div>
+        <div style="min-width:170px;">
+          <label for="lang" style="margin:0 0 6px; font-size:12px; color:var(--muted);">语言</label>
+          <select id="lang" aria-label="Language">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+          </select>
         </div>
       </div>
-    </section>
+    </header>
 
-    <section class="panel">
-      <div class="hd">
-        <strong>抽牌结果</strong>
-        <span class="badge" id="stateBadge">未抽牌</span>
-      </div>
-      <div class="results" id="results"></div>
-    </section>
-  </main>
+    <main>
+      <section class="panel">
+        <div class="hd">
+          <strong id="settingsTitle">设置</strong>
+          <span class="badge" id="stateBadge">未抽牌</span>
+        </div>
+        <div class="bd">
+          <label for="question" id="qLabel">问题（可选）</label>
+          <textarea id="question" placeholder="例如：我接下来三个月的工作走向？"></textarea>
 
-  <footer>
-    本页面为纯前端示例：将 <span class="mono">index.html</span> 部署到静态托管即可上线。
-  </footer>
+          <label for="spread" id="spreadLabel">牌阵</label>
+          <select id="spread">
+            <option value="one">单张（1）</option>
+            <option value="three">三张（过去/现在/未来）</option>
+            <option value="celtic10">凯尔特十字（10）</option>
+          </select>
+
+          <div class="check">
+            <input id="allowReversed" type="checkbox" checked />
+            <span id="revLabel">允许逆位（随机出现）</span>
+          </div>
+
+          <div class="row">
+            <button class="btn primary" id="drawBtn">抽牌</button>
+            <button class="btn" id="reshuffleBtn">重新洗牌</button>
+          </div>
+
+          <div class="row">
+            <button class="btn" id="copyBtn">复制结果</button>
+            <button class="btn danger" id="clearBtn">清空</button>
+          </div>
+
+          <div class="hint" id="hint">
+            维特（RWS）风格：牌名与关键词按经典体系给出（简短版）。如需显示真正维特牌图片，把图片放到仓库的 <code>rws/</code> 文件夹即可（下方有说明）。
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="hd">
+          <strong id="resultsTitle">抽牌结果</strong>
+          <span class="badge" id="deckHint">RWS</span>
+        </div>
+        <div class="results" id="results"></div>
+      </section>
+    </main>
+
+    <footer id="footer">
+      图片可选：将维特（RWS）牌图放入 <code>rws/</code> 文件夹，并命名为 <code>major_00.jpg</code> … <code>major_21.jpg</code>；小阿尔卡那为 <code>minor_wands_01.jpg</code> … <code>minor_pentacles_14.jpg</code>。
+      未提供图片时，会显示简洁占位图，但抽牌与多语言功能不受影响。
+    </footer>
+  </div>
 
   <div class="toast" id="toast"></div>
 
 <script>
-/**
- * 自动抽塔罗牌（单文件版）
- * - 78 张：大阿尔卡那 22 + 小阿尔卡那 56
- * - 不重复抽取
- * - 可选逆位
- */
-
-const SPREADS = {
-  one: {
-    name: "单张",
-    slots: ["指引"]
+/* ========= i18n ========= */
+const I18N = {
+  zh: {
+    ui: {
+      title: "自动抽塔罗牌",
+      sub: "本页面离线可用；白底黑字、简约优雅；支持中/英/日与维特（RWS）牌名/关键词。",
+      cards: "78 张",
+      settings: "设置",
+      results: "抽牌结果",
+      stateNone: "未抽牌",
+      question: "问题（可选）",
+      questionPh: "例如：我接下来三个月的工作走向？",
+      spread: "牌阵",
+      allowRev: "允许逆位（随机出现）",
+      draw: "抽牌",
+      reshuffle: "重新洗牌",
+      copy: "复制结果",
+      clear: "清空",
+      hint: "维特（RWS）风格：牌名与关键词按经典体系给出（简短版）。如需显示真正维特牌图片，把图片放到仓库的 rws/ 文件夹即可（下方有说明）。",
+      footer: "图片可选：将维特（RWS）牌图放入 rws/ 文件夹，并命名为 major_00.jpg … major_21.jpg；小阿尔卡那为 minor_wands_01.jpg … minor_pentacles_14.jpg。未提供图片时，会显示简洁占位图，但抽牌与多语言功能不受影响。",
+      upright: "正位",
+      reversed: "逆位",
+      position: "位置：",
+      arcMajor: "大阿尔卡那",
+      arcMinor: "小阿尔卡那",
+      readyTitle: "准备就绪",
+      readySub: "选择牌阵后点击“抽牌”",
+      readyBody: "你可以先写问题，再抽牌。切换语言会即时刷新界面文字；抽牌结果也会随语言重绘（不换牌）。",
+      copied: "已复制到剪贴板",
+      copyFail: "复制失败：浏览器不允许",
+      noCopy: "暂无可复制内容",
+      cleared: "已清空",
+      reshuffled: "已重新洗牌",
+      drawnBadge: (spreadName, n) => `已抽：${spreadName} · ${n} 张`,
+      time: "时间：",
+      qPrefix: "问题：",
+      spreadPrefix: "牌阵：",
+      meaning: "含义："
+    },
+    spreads: {
+      one: { name:"单张", slots:["指引"] },
+      three: { name:"三张", slots:["过去","现在","未来"] },
+      celtic10: { name:"凯尔特十字", slots:["现状","阻碍/助力","根源/潜意识","近期过去","可能结果","近期未来","你的位置","外界影响","希望与恐惧","最终结果"] }
+    }
   },
-  three: {
-    name: "三张",
-    slots: ["过去", "现在", "未来"]
+  en: {
+    ui: {
+      title: "Tarot (RWS) Auto Draw",
+      sub: "Offline-friendly; black text on white; minimal & elegant; supports Chinese/English/Japanese with Rider–Waite–Smith names & keywords.",
+      cards: "78 cards",
+      settings: "Settings",
+      results: "Results",
+      stateNone: "Not drawn",
+      question: "Question (optional)",
+      questionPh: "e.g. How will my work unfold in the next 3 months?",
+      spread: "Spread",
+      allowRev: "Allow reversed (random)",
+      draw: "Draw",
+      reshuffle: "Reshuffle",
+      copy: "Copy result",
+      clear: "Clear",
+      hint: "RWS style: classic names & short keywords. To show real RWS images, add them into the rws/ folder in your repo (see below).",
+      footer: "Optional images: put RWS images into rws/ and name them major_00.jpg … major_21.jpg; minors as minor_wands_01.jpg … minor_pentacles_14.jpg. Without images, a clean placeholder is shown; features still work.",
+      upright: "Upright",
+      reversed: "Reversed",
+      position: "Position: ",
+      arcMajor: "Major Arcana",
+      arcMinor: "Minor Arcana",
+      readyTitle: "Ready",
+      readySub: "Choose a spread and tap “Draw”",
+      readyBody: "You can type a question first. Switching language refreshes UI text and re-renders the same drawn cards (no re-draw).",
+      copied: "Copied to clipboard",
+      copyFail: "Copy failed: browser blocked it",
+      noCopy: "Nothing to copy",
+      cleared: "Cleared",
+      reshuffled: "Reshuffled",
+      drawnBadge: (spreadName, n) => `Drawn: ${spreadName} · ${n} card(s)`,
+      time: "Time: ",
+      qPrefix: "Question: ",
+      spreadPrefix: "Spread: ",
+      meaning: "Meaning: "
+    },
+    spreads: {
+      one: { name:"Single", slots:["Guidance"] },
+      three: { name:"Three", slots:["Past","Present","Future"] },
+      celtic10: { name:"Celtic Cross", slots:["Present","Challenge/Help","Root/Cause","Recent Past","Possible Outcome","Near Future","You","Environment","Hopes/Fears","Final Outcome"] }
+    }
   },
-  celtic10: {
-    name: "凯尔特十字",
-    slots: [
-      "现状", "阻碍/助力", "潜意识/根源", "近期过去",
-      "可能结果", "近期未来", "你的位置", "外界影响",
-      "希望与恐惧", "最终结果"
-    ]
+  ja: {
+    ui: {
+      title: "タロット（RWS）自動ドロー",
+      sub: "オフライン対応。白地に黒文字のミニマルで上品なデザイン。中/英/日切替とRWS（ウェイト）系の名称・キーワード対応。",
+      cards: "78 枚",
+      settings: "設定",
+      results: "結果",
+      stateNone: "未ドロー",
+      question: "質問（任意）",
+      questionPh: "例：今後3か月の仕事の流れは？",
+      spread: "スプレッド",
+      allowRev: "逆位置を許可（ランダム）",
+      draw: "引く",
+      reshuffle: "シャッフル",
+      copy: "結果をコピー",
+      clear: "クリア",
+      hint: "RWSスタイル：定番の名称と短いキーワード。実際のRWS画像を表示したい場合は、リポジトリに rws/ フォルダを作って画像を入れてください（下記）。",
+      footer: "画像（任意）：RWS画像を rws/ に入れ、major_00.jpg … major_21.jpg。小アルカナは minor_wands_01.jpg … minor_pentacles_14.jpg。画像がなくてもプレースホルダー表示で動作します。",
+      upright: "正位置",
+      reversed: "逆位置",
+      position: "位置：",
+      arcMajor: "大アルカナ",
+      arcMinor: "小アルカナ",
+      readyTitle: "準備OK",
+      readySub: "スプレッドを選び「引く」を押してください",
+      readyBody: "先に質問を書いてから引けます。言語切替はUIと結果表示だけを更新し、同じカードを再描画します（引き直しません）。",
+      copied: "クリップボードにコピーしました",
+      copyFail: "コピー失敗：ブラウザにブロックされました",
+      noCopy: "コピーできる内容がありません",
+      cleared: "クリアしました",
+      reshuffled: "シャッフルしました",
+      drawnBadge: (spreadName, n) => `ドロー：${spreadName} · ${n}枚`,
+      time: "時間：",
+      qPrefix: "質問：",
+      spreadPrefix: "スプレッド：",
+      meaning: "意味："
+    },
+    spreads: {
+      one: { name:"1枚", slots:["導き"] },
+      three: { name:"3枚", slots:["過去","現在","未来"] },
+      celtic10: { name:"ケルト十字", slots:["現状","障害/助け","根源/無意識","直近の過去","可能性の結果","近い未来","あなた","周囲","希望と恐れ","最終結果"] }
+    }
   }
 };
 
-// ---- 牌库（简要关键词，可自行扩写） ----
+/* ========= RWS 牌库：名称三语 + 关键词（短版） ========= */
+/* 大阿尔卡那顺序：0-21（RWS 标准：Justice=11, Strength=8） */
 const MAJOR = [
-  { name: "愚者", up: "开始、自由、冒险", rev: "鲁莽、逃避、缺乏计划" },
-  { name: "魔术师", up: "行动、资源、创造", rev: "操控、分散、技巧不足" },
-  { name: "女祭司", up: "直觉、内在、秘密", rev: "迟钝、隐瞒、忽视直觉" },
-  { name: "女皇", up: "滋养、丰盛、成长", rev: "停滞、过度、依赖" },
-  { name: "皇帝", up: "秩序、权威、结构", rev: "专断、失控、僵化" },
-  { name: "教皇", up: "传统、学习、指引", rev: "教条、反叛、误导" },
-  { name: "恋人", up: "选择、关系、契合", rev: "分歧、诱惑、失衡" },
-  { name: "战车", up: "推进、胜利、意志", rev: "失控、冲突、停滞" },
-  { name: "力量", up: "勇气、耐心、柔韧", rev: "怯懦、冲动、内耗" },
-  { name: "隐者", up: "独处、洞见、寻找", rev: "孤立、逃避、迷茫" },
-  { name: "命运之轮", up: "转机、循环、机会", rev: "阻滞、反复、时机未到" },
-  { name: "正义", up: "公平、因果、决断", rev: "偏颇、逃避责任、误判" },
-  { name: "倒吊人", up: "暂停、换角度、牺牲", rev: "拖延、僵局、无谓牺牲" },
-  { name: "死神", up: "结束、更新、蜕变", rev: "抗拒改变、停滞、旧事难放" },
-  { name: "节制", up: "平衡、调和、疗愈", rev: "极端、失衡、消耗" },
-  { name: "恶魔", up: "束缚、欲望、执念", rev: "解脱、觉醒、戒断" },
-  { name: "高塔", up: "震荡、真相、崩塌重建", rev: "延迟爆发、顽固、侥幸" },
-  { name: "星星", up: "希望、恢复、指引", rev: "失望、怀疑、信心不足" },
-  { name: "月亮", up: "潜意识、迷雾、想象", rev: "揭露、清醒、焦虑缓解" },
-  { name: "太阳", up: "成功、喜悦、清晰", rev: "延迟、阴影、过度自信" },
-  { name: "审判", up: "觉醒、召唤、复盘", rev: "犹豫、后悔、拒绝面对" },
-  { name: "世界", up: "完成、整合、圆满", rev: "未竟、分散、循环未完" }
+  { n:0,  zh:"愚者", en:"The Fool", ja:"愚者", up:{zh:"开始、信任、冒险",en:"beginnings, trust, leap",ja:"始まり・信頼・飛躍"}, rev:{zh:"鲁莽、逃避、散漫",en:"reckless, avoidance, drift",ja:"無謀・逃避・散漫"} },
+  { n:1,  zh:"魔术师", en:"The Magician", ja:"魔術師", up:{zh:"意志、资源、行动",en:"will, tools, action",ja:"意志・道具・行動"}, rev:{zh:"操控、分散、空转",en:"manipulation, scattered, no follow-through",ja:"操作・散漫・空回り"} },
+  { n:2,  zh:"女祭司", en:"The High Priestess", ja:"女教皇", up:{zh:"直觉、内在、秘密",en:"intuition, inner knowing, mystery",ja:"直感・内なる知・神秘"}, rev:{zh:"直觉受阻、隐瞒、忽视信号",en:"blocked intuition, secrecy, ignored signs",ja:"直感停滞・隠し事・無視"} },
+  { n:3,  zh:"女皇", en:"The Empress", ja:"女帝", up:{zh:"丰盛、滋养、创造",en:"abundance, nurture, creation",ja:"豊かさ・育む・創造"}, rev:{zh:"过度、依赖、停滞",en:"overindulgence, dependence, stagnation",ja:"過剰・依存・停滞"} },
+  { n:4,  zh:"皇帝", en:"The Emperor", ja:"皇帝", up:{zh:"结构、权威、稳定",en:"structure, authority, stability",ja:"構造・権威・安定"}, rev:{zh:"专断、僵化、失衡",en:"domineering, rigidity, imbalance",ja:"独裁・硬直・不均衡"} },
+  { n:5,  zh:"教皇", en:"The Hierophant", ja:"教皇", up:{zh:"传统、学习、仪式",en:"tradition, learning, rites",ja:"伝統・学び・儀式"}, rev:{zh:"反叛、教条破裂、另辟蹊径",en:"rebellion, broken dogma, new path",ja:"反発・教条崩れ・新路"} },
+  { n:6,  zh:"恋人", en:"The Lovers", ja:"恋人", up:{zh:"选择、联结、价值一致",en:"choice, union, aligned values",ja:"選択・結び・価値一致"}, rev:{zh:"不一致、诱惑、摇摆",en:"misalignment, temptation, wavering",ja:"不一致・誘惑・迷い"} },
+  { n:7,  zh:"战车", en:"The Chariot", ja:"戦車", up:{zh:"前进、意志、掌控",en:"drive, willpower, control",ja:"前進・意志・制御"}, rev:{zh:"失控、冲突、停滞",en:"loss of control, conflict, stuck",ja:"暴走・衝突・停滞"} },
+  { n:8,  zh:"力量", en:"Strength", ja:"力", up:{zh:"勇气、温柔、内在力量",en:"courage, compassion, inner strength",ja:"勇気・慈愛・内なる力"}, rev:{zh:"自我怀疑、急躁、压抑",en:"self-doubt, impatience, repression",ja:"自信欠如・焦り・抑圧"} },
+  { n:9,  zh:"隐者", en:"The Hermit", ja:"隠者", up:{zh:"内省、指引、独处",en:"introspection, guidance, solitude",ja:"内省・導き・孤独"}, rev:{zh:"孤立、逃避、迷失",en:"isolation, avoidance, lost",ja:"孤立・逃避・迷い"} },
+  { n:10, zh:"命运之轮", en:"Wheel of Fortune", ja:"運命の輪", up:{zh:"转机、循环、机遇",en:"turning point, cycles, opportunity",ja:"転機・循環・機会"}, rev:{zh:"阻滞、反复、时机未到",en:"delays, repetition, poor timing",ja:"停滞・反復・時期尚早"} },
+  { n:11, zh:"正义", en:"Justice", ja:"正義", up:{zh:"公平、因果、抉择",en:"fairness, cause & effect, decision",ja:"公平・因果・決断"}, rev:{zh:"偏颇、逃责、误判",en:"bias, avoiding accountability, misjudgment",ja:"偏り・責任回避・誤判断"} },
+  { n:12, zh:"倒吊人", en:"The Hanged Man", ja:"吊るされた男", up:{zh:"暂停、换角度、放下",en:"pause, new perspective, surrender",ja:"停止・視点転換・手放し"}, rev:{zh:"拖延、僵局、无谓牺牲",en:"stalling, deadlock, needless sacrifice",ja:"先延ばし・膠着・無駄"} },
+  { n:13, zh:"死神", en:"Death", ja:"死神", up:{zh:"结束、蜕变、重生",en:"ending, transformation, rebirth",ja:"終わり・変容・再生"}, rev:{zh:"抗拒改变、停滞、执着旧物",en:"resistance, stagnation, clinging",ja:"変化拒否・停滞・執着"} },
+  { n:14, zh:"节制", en:"Temperance", ja:"節制", up:{zh:"调和、节制、疗愈",en:"balance, moderation, healing",ja:"調和・節度・癒し"}, rev:{zh:"失衡、极端、内耗",en:"imbalance, extremes, friction",ja:"不均衡・極端・摩耗"} },
+  { n:15, zh:"恶魔", en:"The Devil", ja:"悪魔", up:{zh:"束缚、欲望、执念",en:"bondage, desire, attachment",ja:"束縛・欲望・執着"}, rev:{zh:"解脱、觉醒、断舍离",en:"release, awareness, breaking free",ja:"解放・覚醒・断つ"} },
+  { n:16, zh:"高塔", en:"The Tower", ja:"塔", up:{zh:"突变、真相、崩塌重建",en:"sudden change, truth, collapse & rebuild",ja:"急変・真実・崩壊と再建"}, rev:{zh:"延迟爆发、否认、惊而不变",en:"delayed upheaval, denial, resisting change",ja:"遅延・否認・変化拒否"} },
+  { n:17, zh:"星星", en:"The Star", ja:"星", up:{zh:"希望、净化、指引",en:"hope, renewal, guidance",ja:"希望・再生・導き"}, rev:{zh:"失望、怀疑、信心不足",en:"doubt, low faith, discouragement",ja:"疑い・自信不足・落胆"} },
+  { n:18, zh:"月亮", en:"The Moon", ja:"月", up:{zh:"迷雾、潜意识、想象",en:"uncertainty, subconscious, imagination",ja:"霧・無意識・想像"}, rev:{zh:"真相浮现、清醒、恐惧缓解",en:"revelation, clarity, easing fear",ja:"露見・明晰・不安軽減"} },
+  { n:19, zh:"太阳", en:"The Sun", ja:"太陽", up:{zh:"喜悦、成功、清晰",en:"joy, success, clarity",ja:"喜び・成功・明晰"}, rev:{zh:"延迟、骄傲、能量受阻",en:"delays, ego, low vitality",ja:"遅れ・自尊心・活力低下"} },
+  { n:20, zh:"审判", en:"Judgement", ja:"審判", up:{zh:"觉醒、召唤、复盘",en:"awakening, calling, reckoning",ja:"覚醒・呼び声・精算"}, rev:{zh:"犹豫、逃避自省、后悔",en:"hesitation, avoiding reflection, regret",ja:"ためらい・内省回避・後悔"} },
+  { n:21, zh:"世界", en:"The World", ja:"世界", up:{zh:"完成、圆满、整合",en:"completion, wholeness, integration",ja:"完成・円満・統合"}, rev:{zh:"未完成、循环未结、分散",en:"incomplete, unfinished cycle, scattered",ja:"未完・循環未了・散漫"} }
 ];
 
 const SUITS = [
-  { suit: "权杖", upTheme: "行动/热情", revTheme: "拖延/冲突" },
-  { suit: "圣杯", upTheme: "情感/关系", revTheme: "情绪化/失衡" },
-  { suit: "宝剑", upTheme: "思维/沟通", revTheme: "焦虑/对立" },
-  { suit: "星币", upTheme: "现实/金钱", revTheme: "不稳/贪恋" }
+  { key:"wands", zh:"权杖", en:"Wands", ja:"ワンド" },
+  { key:"cups", zh:"圣杯", en:"Cups", ja:"カップ" },
+  { key:"swords", zh:"宝剑", en:"Swords", ja:"ソード" },
+  { key:"pentacles", zh:"星币", en:"Pentacles", ja:"ペンタクル" }
 ];
 
 const RANKS = [
-  { r:"A", name:"Ace", up:"新机会、种子、开启", rev:"机会受阻、延迟" },
-  { r:"2", name:"Two", up:"选择、平衡、合作", rev:"摇摆、对立" },
-  { r:"3", name:"Three", up:"扩展、协作、成果", rev:"分歧、延误" },
-  { r:"4", name:"Four", up:"稳定、休整、边界", rev:"僵化、不安" },
-  { r:"5", name:"Five", up:"冲突、变化、挑战", rev:"缓和、回避" },
-  { r:"6", name:"Six", up:"进展、支持、回报", rev:"拖欠、失衡" },
-  { r:"7", name:"Seven", up:"考验、坚持、策略", rev:"泄气、走捷径" },
-  { r:"8", name:"Eight", up:"推进、熟练、加速", rev:"停滞、分心" },
-  { r:"9", name:"Nine", up:"积累、临门一脚、韧性", rev:"疲惫、疑虑" },
-  { r:"10", name:"Ten", up:"完成、高潮、结果", rev:"过载、尾声拖延" },
-  { r:"P", name:"Page", up:"消息、学习、好奇", rev:"幼稚、误讯" },
-  { r:"N", name:"Knight", up:"行动、推进、追求", rev:"鲁莽、失序" },
-  { r:"Q", name:"Queen", up:"内化、掌控、成熟", rev:"情绪/控制失衡" },
-  { r:"K", name:"King", up:"领导、稳定、负责", rev:"专横、固执" }
+  { v:1,  zh:"Ace",   en:"Ace",   ja:"エース", up:{zh:"开端、火花、潜力",en:"spark, potential, start",ja:"始まり・可能性・火花"}, rev:{zh:"机会受阻、动力不足",en:"blocked start, low drive",ja:"機会阻害・勢い不足"} },
+  { v:2,  zh:"Two",   en:"Two",   ja:"2", up:{zh:"平衡、选择、对话",en:"balance, choice, dialogue",ja:"均衡・選択・対話"}, rev:{zh:"摇摆、拉扯、失衡",en:"tension, imbalance, wavering",ja:"揺れ・対立・不均衡"} },
+  { v:3,  zh:"Three", en:"Three", ja:"3", up:{zh:"扩展、合作、成长",en:"expansion, teamwork, growth",ja:"拡大・協力・成長"}, rev:{zh:"分歧、进展慢",en:"discord, slow progress",ja:"不和・進展遅い"} },
+  { v:4,  zh:"Four",  en:"Four",  ja:"4", up:{zh:"稳定、巩固、休整",en:"stability, consolidation, rest",ja:"安定・固め・休息"}, rev:{zh:"停滞、焦躁",en:"stagnation, restlessness",ja:"停滞・焦燥"} },
+  { v:5,  zh:"Five",  en:"Five",  ja:"5", up:{zh:"冲突、考验、变化",en:"conflict, trial, change",ja:"衝突・試練・変化"}, rev:{zh:"缓和、和解趋势",en:"easing, reconciliation",ja:"緩和・和解"} },
+  { v:6,  zh:"Six",   en:"Six",   ja:"6", up:{zh:"支持、回报、进展",en:"support, reward, progress",ja:"支援・報酬・進展"}, rev:{zh:"付出失衡、拖欠",en:"imbalance, delays",ja:"不均衡・遅延"} },
+  { v:7,  zh:"Seven", en:"Seven", ja:"7", up:{zh:"策略、坚持、选择",en:"strategy, perseverance, choice",ja:"戦略・粘り・選択"}, rev:{zh:"犹豫、走捷径",en:"indecision, shortcuts",ja:"迷い・近道"} },
+  { v:8,  zh:"Eight", en:"Eight", ja:"8", up:{zh:"推进、熟练、速度",en:"momentum, skill, speed",ja:"推進・熟練・加速"}, rev:{zh:"分心、停滞",en:"distraction, stalled",ja:"散漫・停滞"} },
+  { v:9,  zh:"Nine",  en:"Nine",  ja:"9", up:{zh:"积累、韧性、临门一脚",en:"resilience, near success, stamina",ja:"粘り・あと一歩・持久"}, rev:{zh:"疲惫、疑虑",en:"fatigue, doubt",ja:"疲労・疑念"} },
+  { v:10, zh:"Ten",   en:"Ten",   ja:"10", up:{zh:"完成、收束、结果",en:"completion, outcome, culmination",ja:"完成・結果・収束"}, rev:{zh:"负担过重、拖延收尾",en:"overload, dragged ending",ja:"過負荷・終盤遅れ"} },
+  { v:11, zh:"Page",  en:"Page",  ja:"ペイジ", up:{zh:"信息、学习、好奇",en:"message, learning, curiosity",ja:"知らせ・学び・好奇心"}, rev:{zh:"不成熟、误讯",en:"immature, false news",ja:"未熟・誤報"} },
+  { v:12, zh:"Knight",en:"Knight",ja:"ナイト", up:{zh:"推进、行动、追求",en:"pursuit, action, drive",ja:"追求・行動・推進"}, rev:{zh:"鲁莽、失序",en:"reckless, chaotic",ja:"無謀・混乱"} },
+  { v:13, zh:"Queen", en:"Queen", ja:"クイーン", up:{zh:"成熟、掌控、滋养",en:"maturity, mastery, nurturing",ja:"成熟・掌握・育む"}, rev:{zh:"失衡、控制/情绪过度",en:"imbalance, overcontrol/emotion",ja:"不均衡・過剰な支配/感情"} },
+  { v:14, zh:"King",  en:"King",  ja:"キング", up:{zh:"领导、稳定、责任",en:"leadership, stability, responsibility",ja:"統率・安定・責任"}, rev:{zh:"专横、固执",en:"domineering, stubborn",ja:"横暴・頑固"} }
 ];
 
 function buildDeck(){
   const deck = [];
-  // Major 22
-  for (const c of MAJOR){
+
+  for (const m of MAJOR){
     deck.push({
-      id: "M-" + c.name,
-      name: c.name,
-      arcana: "大阿尔卡那",
-      up: c.up,
-      rev: c.rev
+      id: `major_${String(m.n).padStart(2,"0")}`,
+      type: "major",
+      num: m.n,
+      name: { zh: m.zh, en: m.en, ja: m.ja },
+      up: m.up,
+      rev: m.rev,
+      img: `rws/major_${String(m.n).padStart(2,"0")}.jpg`
     });
   }
-  // Minor 56
+
   for (const s of SUITS){
-    for (const rk of RANKS){
-      const display = `${s.suit}${rk.r}`;
+    for (const r of RANKS){
+      const rankIndex = r.v; // 1..14
       deck.push({
-        id: `m-${s.suit}-${rk.r}`,
-        name: `${display}（${s.suit}）`,
-        arcana: "小阿尔卡那",
-        up: `${s.upTheme}：${rk.up}`,
-        rev: `${s.revTheme}：${rk.rev}`
+        id: `minor_${s.key}_${String(rankIndex).padStart(2,"0")}`,
+        type: "minor",
+        suit: s,
+        rank: r,
+        img: `rws/minor_${s.key}_${String(rankIndex).padStart(2,"0")}.jpg`
       });
     }
   }
+
   return deck;
 }
 
-let deck = buildDeck();
-let rngSeed = null; // 可扩展成可复现随机；此处保留接口
-let lastDraw = [];
-
+/* ========= 状态与工具函数 ========= */
 const els = {
+  lang: document.getElementById("lang"),
   spread: document.getElementById("spread"),
+  question: document.getElementById("question"),
   allowReversed: document.getElementById("allowReversed"),
   drawBtn: document.getElementById("drawBtn"),
   reshuffleBtn: document.getElementById("reshuffleBtn"),
   copyBtn: document.getElementById("copyBtn"),
   clearBtn: document.getElementById("clearBtn"),
   results: document.getElementById("results"),
-  badge: document.getElementById("stateBadge"),
-  question: document.getElementById("question"),
-  toast: document.getElementById("toast")
+  stateBadge: document.getElementById("stateBadge"),
+  toast: document.getElementById("toast"),
+
+  pageTitle: document.getElementById("pageTitle"),
+  pageSub: document.getElementById("pageSub"),
+  cardsPill: document.getElementById("cardsPill"),
+  settingsTitle: document.getElementById("settingsTitle"),
+  resultsTitle: document.getElementById("resultsTitle"),
+  qLabel: document.getElementById("qLabel"),
+  spreadLabel: document.getElementById("spreadLabel"),
+  revLabel: document.getElementById("revLabel"),
+  hint: document.getElementById("hint"),
+  footer: document.getElementById("footer")
 };
+
+function L(){ return I18N[els.lang.value]; }
+function ui(){ return L().ui; }
+function spreadDef(key){ return L().spreads[key]; }
 
 function toast(msg){
   els.toast.textContent = msg;
@@ -432,7 +640,6 @@ function toast(msg){
   setTimeout(() => els.toast.classList.remove("show"), 1400);
 }
 
-// Fisher-Yates shuffle
 function shuffle(arr){
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--){
@@ -442,18 +649,22 @@ function shuffle(arr){
   return a;
 }
 
+/* ========= 抽牌逻辑（不重复） ========= */
+const deck = buildDeck();
 let shuffled = shuffle(deck);
 let cursor = 0;
+
+/* 关键：为了做到“切语言不换牌”，保存抽到的原始牌 + 每张的正逆位 */
+let lastDraw = null; // { spreadKey, time, question, items:[{cardId, reversed}] }
 
 function reshuffle(){
   shuffled = shuffle(deck);
   cursor = 0;
-  toast("已重新洗牌");
+  toast(ui().reshuffled);
 }
 
-function draw(n){
+function drawCards(n){
   if (cursor + n > shuffled.length){
-    // 抽完自动重洗
     reshuffle();
   }
   const picked = shuffled.slice(cursor, cursor + n);
@@ -461,110 +672,213 @@ function draw(n){
   return picked;
 }
 
-function render(draws, spreadKey){
-  els.results.innerHTML = "";
-  const spread = SPREADS[spreadKey];
-  const allowRev = els.allowReversed.checked;
+function getCardById(id){
+  return deck.find(c => c.id === id);
+}
 
-  draws.forEach((card, idx) => {
-    const reversed = allowRev ? (Math.random() < 0.35) : false; // 逆位概率可调
-    const meaning = reversed ? card.rev : card.up;
+function formatCardName(card){
+  const lang = els.lang.value;
+  if (card.type === "major"){
+    return card.name[lang];
+  }
+  // minor: "Ace of Wands" / 中文：权杖 Ace / 日文：ワンド エース 也可以
+  const suitName = card.suit[lang];
+  const r = card.rank;
+  if (lang === "zh"){
+    // 简洁：权杖 Ace（保留 RWS rank 习惯）
+    return `${suitName} ${r.zh}`;
+  }
+  if (lang === "ja"){
+    return `${suitName} ${r.ja}`;
+  }
+  return `${r.en} of ${suitName}`;
+}
 
-    const el = document.createElement("div");
-    el.className = "card";
-    el.innerHTML = `
+function formatArcana(card){
+  return card.type === "major" ? ui().arcMajor : ui().arcMinor;
+}
+
+function formatMeaning(card, reversed){
+  const lang = els.lang.value;
+  if (card.type === "major"){
+    return reversed ? card.rev[lang] : card.up[lang];
+  }
+  const suitName = card.suit[lang];
+  const r = card.rank;
+  const base = reversed ? r.rev[lang] : r.up[lang];
+  // 保持简洁：不额外加主题色/花哨
+  return (lang === "en") ? base : base;
+}
+
+function renderReady(){
+  els.results.innerHTML = `
+    <div class="card" style="grid-column:1/-1;">
       <div class="top">
         <div>
-          <p class="title">${card.name}</p>
-          <p class="subtitle">${card.arcana}</p>
+          <p class="title">${ui().readyTitle}</p>
+          <p class="subtitle">${ui().readySub}</p>
         </div>
-        <span class="badge ${reversed ? "rev":"up"}">${reversed ? "逆位" : "正位"}</span>
+        <span class="badge">RWS</span>
       </div>
-      <div class="art">${card.arcana === "大阿尔卡那" ? "MAJOR" : "MINOR"}</div>
+      <div class="art">
+        <div class="placeholder">TAROT</div>
+      </div>
       <div class="body">
-        <div class="slot">位置：${spread.slots[idx] ?? ("第" + (idx+1) + "张")}</div>
-        <p>${meaning}</p>
+        <p class="meaning">${ui().readyBody}</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderFromState(){
+  if (!lastDraw){
+    els.stateBadge.textContent = ui().stateNone;
+    renderReady();
+    return;
+  }
+
+  const spread = spreadDef(lastDraw.spreadKey);
+  els.stateBadge.textContent = ui().drawnBadge(spread.name, lastDraw.items.length);
+
+  els.results.innerHTML = "";
+
+  lastDraw.items.forEach((it, idx) => {
+    const card = getCardById(it.cardId);
+    const reversed = it.reversed;
+    const title = formatCardName(card);
+    const arc = formatArcana(card);
+    const meaning = formatMeaning(card, reversed);
+    const slot = spread.slots[idx] ?? (els.lang.value === "zh" ? `第${idx+1}张` : `#${idx+1}`);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "card";
+
+    // 图片：尝试加载 rws/xxx.jpg，失败则占位
+    wrapper.innerHTML = `
+      <div class="top">
+        <div>
+          <p class="title">${title}</p>
+          <p class="subtitle">${arc}</p>
+        </div>
+        <span class="badge ${reversed ? "reversed" : "upright"}">${reversed ? ui().reversed : ui().upright}</span>
+      </div>
+
+      <div class="art">
+        <img alt="${title}" src="${card.img}" onerror="this.remove(); this.parentElement.querySelector('.placeholder').style.display='flex';" />
+        <div class="placeholder" style="display:none;">RWS</div>
+      </div>
+
+      <div class="body">
+        <div class="slot">${ui().position}${slot}</div>
+        <p class="meaning">${meaning}</p>
       </div>
     `;
-    els.results.appendChild(el);
-
-    card.__reversed = reversed;
-    card.__meaning = meaning;
-    card.__slot = spread.slots[idx] ?? ("第" + (idx+1) + "张");
+    els.results.appendChild(wrapper);
   });
-
-  const q = els.question.value.trim();
-  const ts = new Date().toLocaleString("zh-CN");
-  els.badge.textContent = `已抽：${SPREADS[spreadKey].name} · ${draws.length} 张`;
-
-  lastDraw = {
-    time: ts,
-    question: q,
-    spread: SPREADS[spreadKey].name,
-    cards: draws.map(c => ({
-      slot: c.__slot,
-      name: c.name,
-      orientation: c.__reversed ? "逆位" : "正位",
-      meaning: c.__meaning
-    }))
-  };
 }
 
 function onDraw(){
   const spreadKey = els.spread.value;
-  const spread = SPREADS[spreadKey];
-  const picked = draw(spread.slots.length);
-  render(picked, spreadKey);
+  const spread = spreadDef(spreadKey);
+  const picked = drawCards(spread.slots.length);
+
+  lastDraw = {
+    spreadKey,
+    time: new Date().toISOString(),
+    question: els.question.value.trim(),
+    items: picked.map(c => ({
+      cardId: c.id,
+      reversed: els.allowReversed.checked ? (Math.random() < 0.35) : false
+    }))
+  };
+
+  renderFromState();
 }
 
 function onCopy(){
-  if (!lastDraw || !lastDraw.cards){
-    toast("暂无可复制内容");
+  if (!lastDraw){
+    toast(ui().noCopy);
     return;
   }
+  const spread = spreadDef(lastDraw.spreadKey);
+  const lang = els.lang.value;
+  const when = new Date().toLocaleString(lang === "zh" ? "zh-CN" : (lang === "ja" ? "ja-JP" : "en-US"));
+
   const lines = [];
-  lines.push(`时间：${lastDraw.time}`);
-  if (lastDraw.question) lines.push(`问题：${lastDraw.question}`);
-  lines.push(`牌阵：${lastDraw.spread}`);
+  lines.push(`${ui().time}${when}`);
+  if (lastDraw.question) lines.push(`${ui().qPrefix}${lastDraw.question}`);
+  lines.push(`${ui().spreadPrefix}${spread.name}`);
   lines.push("");
-  for (const c of lastDraw.cards){
-    lines.push(`${c.slot}：${c.name}（${c.orientation}）`);
-    lines.push(`- 含义：${c.meaning}`);
-  }
-  const text = lines.join("\n");
-  navigator.clipboard.writeText(text)
-    .then(() => toast("已复制到剪贴板"))
-    .catch(() => toast("复制失败：浏览器不允许"));
+
+  lastDraw.items.forEach((it, idx) => {
+    const card = getCardById(it.cardId);
+    const slot = spread.slots[idx] ?? (lang === "zh" ? `第${idx+1}张` : `#${idx+1}`);
+    const title = formatCardName(card);
+    const ori = it.reversed ? ui().reversed : ui().upright;
+    const meaning = formatMeaning(card, it.reversed);
+
+    lines.push(`${slot}: ${title} (${ori})`);
+    lines.push(`- ${ui().meaning}${meaning}`);
+  });
+
+  navigator.clipboard.writeText(lines.join("\n"))
+    .then(() => toast(ui().copied))
+    .catch(() => toast(ui().copyFail));
 }
 
 function onClear(){
-  els.results.innerHTML = "";
-  els.badge.textContent = "未抽牌";
-  lastDraw = [];
-  toast("已清空");
+  lastDraw = null;
+  toast(ui().cleared);
+  renderFromState();
 }
 
+/* ========= UI 文案刷新 ========= */
+function applyUI(){
+  document.title = ui().title;
+
+  els.pageTitle.textContent = ui().title;
+  els.pageSub.textContent = ui().sub;
+
+  els.cardsPill.textContent = ui().cards;
+  els.settingsTitle.textContent = ui().settings;
+  els.resultsTitle.textContent = ui().results;
+
+  els.qLabel.textContent = ui().question;
+  els.question.placeholder = ui().questionPh;
+
+  els.spreadLabel.textContent = ui().spread;
+  els.revLabel.textContent = ui().allowRev;
+
+  els.drawBtn.textContent = ui().draw;
+  els.reshuffleBtn.textContent = ui().reshuffle;
+  els.copyBtn.textContent = ui().copy;
+  els.clearBtn.textContent = ui().clear;
+
+  els.hint.textContent = ui().hint;
+  els.footer.textContent = ui().footer;
+
+  // spread 选项文字
+  const s = L().spreads;
+  const opts = els.spread.querySelectorAll("option");
+  opts.forEach(o => {
+    if (o.value === "one") o.textContent = `${s.one.name} (1)`;
+    if (o.value === "three") o.textContent = `${s.three.name} (3)`;
+    if (o.value === "celtic10") o.textContent = `${s.celtic10.name} (10)`;
+  });
+
+  // 切语言时：不换牌，只重绘
+  renderFromState();
+}
+
+/* ========= 事件 ========= */
 els.drawBtn.addEventListener("click", onDraw);
 els.reshuffleBtn.addEventListener("click", reshuffle);
 els.copyBtn.addEventListener("click", onCopy);
 els.clearBtn.addEventListener("click", onClear);
+els.lang.addEventListener("change", applyUI);
 
-// 初始提示
-els.results.innerHTML = `
-  <div class="card" style="grid-column:1/-1;">
-    <div class="top">
-      <div>
-        <p class="title">准备就绪</p>
-        <p class="subtitle">选择牌阵后点击“抽牌”</p>
-      </div>
-      <span class="badge">提示</span>
-    </div>
-    <div class="art">TAROT</div>
-    <div class="body">
-      <p>你可以先写问题，再抽牌。若想做“更像真正塔罗”的效果：为每张牌补充更长解释、加入图片素材、增加牌阵自定义即可。</p>
-    </div>
-  </div>
-`;
+/* 初始化 */
+applyUI();
 </script>
 </body>
 </html>
